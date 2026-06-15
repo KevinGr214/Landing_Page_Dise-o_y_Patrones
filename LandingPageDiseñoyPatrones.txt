@@ -1,0 +1,1345 @@
+Estructura del proyecto
+parkease-landing/
+├── pom.xml
+├── .gitignore
+├── README.md
+└── src/
+    └── main/
+        ├── java/com/parkease/
+        │   ├── ParkEaseApplication.java
+        │   ├── controller/ContactController.java
+        │   └── model/ContactRequest.java
+        └── resources/
+            ├── application.properties
+            └── static/
+                ├── index.html
+                ├── css/styles.css
+                └── js/main.js
+pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.0</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.parkease</groupId>
+  <artifactId>parkease-landing</artifactId>
+  <version>1.0.0</version>
+  <name>ParkEase Landing Page</name>
+  <description>Landing page para la app de estacionamientos ParkEase - Lima, Perú</description>
+
+  <properties>
+    <java.version>17</java.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+src/main/java/com/parkease/ParkEaseApplication.java
+package com.parkease;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ParkEaseApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ParkEaseApplication.class, args);
+    }
+}
+src/main/java/com/parkease/model/ContactRequest.java
+package com.parkease.model;
+
+public class ContactRequest {
+    private String nombre;
+    private String email;
+    private String tipo;
+    private String mensaje;
+
+    public ContactRequest() {}
+
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+
+    public String getMensaje() { return mensaje; }
+    public void setMensaje(String mensaje) { this.mensaje = mensaje; }
+}
+src/main/java/com/parkease/controller/ContactController.java
+package com.parkease.controller;
+
+import com.parkease.model.ContactRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api")
+public class ContactController {
+
+    @PostMapping("/contact")
+    public ResponseEntity<Map<String, Object>> handleContact(
+            @RequestBody ContactRequest request) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        if (request.getNombre() == null || request.getNombre().isBlank()
+                || request.getEmail() == null || request.getEmail().isBlank()
+                || request.getMensaje() == null || request.getMensaje().isBlank()) {
+
+            response.put("success", false);
+            response.put("message", "Por favor completa todos los campos requeridos.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // Aquí puedes integrar un servicio de email (JavaMailSender, SendGrid, etc.)
+        System.out.printf("Nuevo contacto: %s <%s> [%s]%nMensaje: %s%n",
+                request.getNombre(), request.getEmail(),
+                request.getTipo(), request.getMensaje());
+
+        response.put("success", true);
+        response.put("message", "¡Mensaje enviado! Te contactaremos pronto.");
+        return ResponseEntity.ok(response);
+    }
+}
+src/main/resources/application.properties
+server.port=8080
+spring.application.name=parkease-landing
+spring.web.resources.static-locations=classpath:/static/
+src/main/resources/static/index.html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParkEase – Estacionamientos en Lima</title>
+  <meta name="description" content="Encuentra y reserva tu estacionamiento en Lima en segundos. Paga con Yape o Plin, reserva anticipada y GPS en tiempo real." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="navbar" id="navbar">
+  <div class="container navbar-inner">
+    <a href="#inicio" class="logo">
+      <div class="logo-icon">P</div>
+      <span>ParkEase</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#como-funciona">Cómo funciona</a></li>
+      <li><a href="#caracteristicas">Características</a></li>
+      <li><a href="#usuarios">Usuarios</a></li>
+      <li><a href="#testimonios">Testimonios</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <a href="#contacto" class="btn btn-primary nav-cta">Descargar App</a>
+    <button class="hamburger" id="hamburger" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="inicio">
+  <div class="hero-bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge">🟢 Disponible en Lima</div>
+      <h1>Encuentra y reserva tu estacionamiento en segundos</h1>
+      <p>La forma más rápida y segura de encontrar estacionamiento en Lima. Ahorra tiempo, paga digital y llega directo a tu espacio reservado.</p>
+      <div class="hero-stats">
+        <div class="stat"><strong>+15,000</strong><span>Conductores</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><strong>+350</strong><span>Playas</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><strong>4.8★</strong><span>Calificación</span></div>
+      </div>
+      <div class="hero-buttons">
+        <a href="#" class="btn btn-white">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          App Store
+        </a>
+        <a href="#" class="btn btn-white">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.24.99.19l13.18-7.61-2.79-2.79-11.38 10.21zm16.87-10.69L17.04 11.5l-2.96 2.96 2.96 2.96 3.05-1.58c.87-.45.87-1.58-.04-2.77zM3.01.43C2.7.59 2.5.9 2.5 1.28v21.44c0 .38.2.69.51.85l.11.06 12.02-12.02v-.28L3.12.37 3.01.43zm10.41 13.29L3.18.24l.01-.01 10.2 9.16-2.97 2.97 2.97 2.97v-.01l.03.37z"/></svg>
+          Google Play
+        </a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="phone-frame">
+        <img
+          src="https://images.unsplash.com/photo-1536825591064-574efec257f2?w=500&q=80"
+          alt="ParkEase App en uso dentro del auto"
+          loading="eager"
+        />
+      </div>
+      <div class="hero-floating-card card-top">
+        <span class="card-icon">📍</span>
+        <div><strong>Espacio encontrado</strong><br/><small>A 200m de ti</small></div>
+      </div>
+      <div class="hero-floating-card card-bottom">
+        <span class="card-icon">✅</span>
+        <div><strong>Reserva confirmada</strong><br/><small>Pago con Yape exitoso</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CÓMO FUNCIONA ==================== -->
+<section class="section how-it-works" id="como-funciona">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Proceso simple</span>
+      <h2>¿Cómo funciona ParkEase?</h2>
+      <p>En solo 4 pasos estarás estacionado sin estrés</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-icon">🔍</div>
+        <h3>Busca</h3>
+        <p>Ingresa tu destino y encuentra playas de estacionamiento disponibles cercanas en el mapa en tiempo real.</p>
+      </div>
+      <div class="step-connector">→</div>
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-icon">📅</div>
+        <h3>Reserva</h3>
+        <p>Selecciona el espacio que prefieras y reserva con anticipación para garantizar tu lugar al llegar.</p>
+      </div>
+      <div class="step-connector">→</div>
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-icon">💳</div>
+        <h3>Paga</h3>
+        <p>Paga de forma segura con Yape, Plin o tarjeta. Sin efectivo, sin colas, sin complicaciones.</p>
+      </div>
+      <div class="step-connector">→</div>
+      <div class="step-card">
+        <div class="step-number">04</div>
+        <div class="step-icon">🚗</div>
+        <h3>Estaciona</h3>
+        <p>Llega directo a tu espacio reservado. La playa ya sabe que vienes. Sin esperas innecesarias.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CARACTERÍSTICAS ==================== -->
+<section class="section features" id="caracteristicas">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Todo incluido</span>
+      <h2>Características que marcan la diferencia</h2>
+      <p>Todo lo que necesitas para estacionar sin estrés en Lima</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E8F8F0; color:#2ECC71">📍</div>
+        <h3>GPS en Tiempo Real</h3>
+        <p>Visualiza en el mapa todos los estacionamientos disponibles cerca de ti con actualización en tiempo real.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EBF5FB; color:#1A2E4A">📅</div>
+        <h3>Reserva Anticipada</h3>
+        <p>Asegura tu espacio con hasta 24 horas de anticipación. Llega tranquilo sin preocuparte por disponibilidad.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E8F8F0; color:#2ECC71">💰</div>
+        <h3>Pago Digital</h3>
+        <p>Compatible con Yape, Plin y tarjetas de crédito/débito. Transacciones 100% seguras y encriptadas.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EBF5FB; color:#1A2E4A">🔔</div>
+        <h3>Notificaciones Inteligentes</h3>
+        <p>Recibe alertas sobre tu reserva, tiempo de vencimiento y disponibilidad de espacios favoritos.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E8F8F0; color:#2ECC71">📊</div>
+        <h3>Historial Completo</h3>
+        <p>Accede a todo tu historial de estacionamientos, gastos mensuales y espacios favoritos desde la app.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EBF5FB; color:#1A2E4A">🛡️</div>
+        <h3>Soporte 24/7</h3>
+        <p>Equipo de soporte disponible todos los días para ayudarte con cualquier problema o consulta.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONDUCTORES VS GESTORES ==================== -->
+<section class="section audience" id="usuarios">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Para todos</span>
+      <h2>¿Quién usa ParkEase?</h2>
+      <p>Soluciones pensadas para conductores y gestores de estacionamientos</p>
+    </div>
+    <div class="audience-grid">
+      <!-- Conductores -->
+      <div class="audience-card card-driver">
+        <div class="audience-img">
+          <img
+            src="https://images.unsplash.com/photo-1543465077-db45d34b88a5?w=600&q=80"
+            alt="Conductores en Lima"
+            loading="lazy"
+          />
+        </div>
+        <div class="audience-content">
+          <div class="audience-tag driver">Para Conductores</div>
+          <h3>Encuentra y reserva en segundos</h3>
+          <ul class="audience-list">
+            <li>✅ Mapa interactivo de espacios disponibles</li>
+            <li>✅ Reserva anticipada garantizada</li>
+            <li>✅ Pago con Yape, Plin o tarjeta</li>
+            <li>✅ Historial de estacionamientos</li>
+            <li>✅ Notificaciones en tiempo real</li>
+            <li>✅ Espacios favoritos guardados</li>
+          </ul>
+          <a href="#" class="btn btn-primary">Descargar para conductores</a>
+        </div>
+      </div>
+      <!-- Gestores -->
+      <div class="audience-card card-manager">
+        <div class="audience-img">
+          <img
+            src="https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=600&q=80"
+            alt="Gestores de estacionamiento"
+            loading="lazy"
+          />
+        </div>
+        <div class="audience-content">
+          <div class="audience-tag manager">Para Gestores</div>
+          <h3>Administra tu playa de forma inteligente</h3>
+          <ul class="audience-list">
+            <li>✅ Panel de control en tiempo real</li>
+            <li>✅ Gestión de reservas y disponibilidad</li>
+            <li>✅ Cobros digitales automatizados</li>
+            <li>✅ Reportes y analytics de ingresos</li>
+            <li>✅ Múltiples sucursales desde un panel</li>
+            <li>✅ Soporte prioritario dedicado</li>
+          </ul>
+          <a href="#contacto" class="btn btn-success">Registrar mi playa</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TESTIMONIOS ==================== -->
+<section class="section testimonials" id="testimonios">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Lo que dicen</span>
+      <h2>Usuarios que confían en ParkEase</h2>
+      <p>Miles de limeños ya estacionan sin estrés cada día</p>
+    </div>
+
+    <!-- Métricas -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-number">+15,000</div>
+        <div class="metric-label">Conductores activos</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-number">+350</div>
+        <div class="metric-label">Playas registradas</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-number">98%</div>
+        <div class="metric-label">Reservas exitosas</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-number">4.8★</div>
+        <div class="metric-label">Calificación promedio</div>
+      </div>
+    </div>
+
+    <!-- Testimonios -->
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p>"Antes perdía 20 minutos buscando dónde estacionar en Miraflores. Con ParkEase llego directo a mi espacio. ¡Increíble!"</p>
+        <div class="testimonial-author">
+          <div class="avatar" style="background:#2ECC71">CM</div>
+          <div>
+            <strong>Carlos M.</strong>
+            <span>Conductor en Miraflores</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p>"Como gestora de una playa en San Isidro, el panel de control me permite ver todo en tiempo real. Los ingresos subieron 35% el primer mes."</p>
+        <div class="testimonial-author">
+          <div class="avatar" style="background:#1A2E4A">LR</div>
+          <div>
+            <strong>Lucía R.</strong>
+            <span>Gestora en San Isidro</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p>"Pagar con Yape es súper rápido. Reservé mi espacio desde la oficina y cuando llegué al centro comercial ya estaba todo listo."</p>
+        <div class="testimonial-author">
+          <div class="avatar" style="background:#2ECC71">AP</div>
+          <div>
+            <strong>Andrea P.</strong>
+            <span>Conductora en Surco</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONTACTO ==================== -->
+<section class="section contact" id="contacto">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Contáctanos</span>
+      <h2>¿Tienes alguna pregunta?</h2>
+      <p>Escríbenos y te respondemos en menos de 24 horas</p>
+    </div>
+    <div class="contact-grid">
+      <!-- Info -->
+      <div class="contact-info">
+        <div class="contact-info-item">
+          <div class="contact-info-icon">📧</div>
+          <div>
+            <strong>Email</strong>
+            <span>hola@parkease.pe</span>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-info-icon">📱</div>
+          <div>
+            <strong>WhatsApp</strong>
+            <span>+51 987 654 321</span>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-info-icon">📍</div>
+          <div>
+            <strong>Oficina</strong>
+            <span>Av. Larco 1150, Miraflores, Lima</span>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-info-icon">⏰</div>
+          <div>
+            <strong>Horario de soporte</strong>
+            <span>Lun–Dom, 8am – 10pm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <form class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre completo *</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Correo electrónico *</label>
+            <input type="email" id="email" name="email" placeholder="tu@email.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="tipo">Soy...</label>
+          <select id="tipo" name="tipo">
+            <option value="conductor">Conductor buscando estacionamiento</option>
+            <option value="gestor">Gestor de playa de estacionamiento</option>
+            <option value="empresa">Empresa / corporativo</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="mensaje">Mensaje *</label>
+          <textarea id="mensaje" name="mensaje" rows="5" placeholder="¿En qué podemos ayudarte?" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+          Enviar mensaje
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-icon">P</div>
+          <span style="color:white">ParkEase</span>
+        </div>
+        <p>La app de estacionamientos más usada en Lima. Rápido, seguro y siempre disponible.</p>
+        <div class="social-links">
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="Facebook">📘</a>
+          <a href="#" aria-label="Twitter/X">🐦</a>
+          <a href="#" aria-label="LinkedIn">💼</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Producto</h4>
+        <ul>
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#caracteristicas">Características</a></li>
+          <li><a href="#usuarios">Para conductores</a></li>
+          <li><a href="#usuarios">Para gestores</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Empresa</h4>
+        <ul>
+          <li><a href="#">Nosotros</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Prensa</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Términos de servicio</a></li>
+          <li><a href="#">Política de privacidad</a></li>
+          <li><a href="#">Política de cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 ParkEase. Todos los derechos reservados. Hecho con ❤️ en Lima, Perú.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script src="/js/main.js"></script>
+</body>
+</html>
+src/main/resources/static/css/styles.css
+/* =============================================
+   PARKEASE – LANDING PAGE STYLES
+   Paleta: #1A2E4A | #2ECC71 | #F5F7FA | #E74C3C
+   ============================================= */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary:   #1A2E4A;
+  --green:     #2ECC71;
+  --bg:        #F5F7FA;
+  --white:     #FFFFFF;
+  --red:       #E74C3C;
+  --text:      #2D3748;
+  --text-muted:#718096;
+  --radius:    12px;
+  --shadow:    0 4px 24px rgba(26,46,74,.10);
+  --shadow-lg: 0 12px 48px rgba(26,46,74,.18);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+}
+
+/* ---- UTILITIES ---- */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+.section { padding: 5rem 0; }
+
+.section-header { text-align: center; margin-bottom: 3.5rem; }
+
+.section-badge {
+  display: inline-block;
+  background: var(--green);
+  color: var(--white);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: .3rem .9rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.section-header h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: .75rem;
+}
+
+.section-header p { color: var(--text-muted); font-size: 1.1rem; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .75rem 1.75rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: .95rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .15s, opacity .15s;
+}
+
+.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary { background: var(--green); color: var(--white); }
+.btn-primary:hover { background: #27ae60; }
+.btn-success { background: var(--green); color: var(--white); }
+.btn-white { background: var(--white); color: var(--primary); font-weight: 700; }
+.btn-white:hover { background: #f0f0f0; }
+.btn-block { width: 100%; justify-content: center; padding: 1rem; font-size: 1rem; }
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* ---- NAVBAR ---- */
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(26,46,74,.97);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  transition: box-shadow .3s;
+}
+
+.navbar.scrolled { box-shadow: var(--shadow-lg); }
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  text-decoration: none;
+  color: var(--white);
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.logo-icon {
+  width: 36px; height: 36px;
+  background: var(--green);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--white);
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: rgba(255,255,255,.8);
+  text-decoration: none;
+  font-size: .9rem;
+  font-weight: 500;
+  transition: color .2s;
+}
+
+.nav-links a:hover { color: var(--green); }
+
+.nav-cta { padding: .5rem 1.25rem; font-size: .9rem; }
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: .5rem;
+}
+
+.hamburger span {
+  display: block;
+  width: 24px; height: 2px;
+  background: var(--white);
+  border-radius: 2px;
+  transition: .3s;
+}
+
+/* ---- HERO ---- */
+.hero {
+  min-height: 100vh;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 68px;
+}
+
+.hero-bg-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .08;
+}
+
+.shape { position: absolute; border: 2px solid var(--white); }
+.shape-1 { width: 300px; height: 300px; border-radius: 50%; top: 10%; left: -5%; }
+.shape-2 { width: 400px; height: 400px; border-radius: 24px; bottom: -10%; right: -5%; transform: rotate(30deg); }
+.shape-3 { width: 200px; height: 200px; border-radius: 16px; top: 55%; left: 20%; }
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  padding: 5rem 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content { color: var(--white); }
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(46,204,113,.15);
+  border: 1px solid rgba(46,204,113,.4);
+  color: var(--green);
+  padding: .35rem .9rem;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.hero-content h1 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1.25rem;
+}
+
+.hero-content p { color: rgba(255,255,255,.75); font-size: 1.1rem; margin-bottom: 2rem; }
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat { text-align: center; }
+.stat strong { display: block; font-size: 1.4rem; font-weight: 800; color: var(--green); }
+.stat span { font-size: .8rem; color: rgba(255,255,255,.6); }
+.stat-divider { width: 1px; height: 36px; background: rgba(255,255,255,.2); }
+
+.hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+.hero-image { position: relative; display: flex; justify-content: center; }
+
+.phone-frame {
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  max-width: 420px;
+  width: 100%;
+}
+
+.phone-frame img { width: 100%; height: 500px; object-fit: cover; border-radius: 28px; }
+
+.hero-floating-card {
+  position: absolute;
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.card-top { top: 10%; left: -10%; animation-delay: 0s; }
+.card-bottom { bottom: 15%; right: -8%; animation-delay: 1.5s; }
+
+.card-icon { font-size: 1.5rem; }
+.hero-floating-card strong { font-size: .85rem; color: var(--primary); display: block; }
+.hero-floating-card small { font-size: .75rem; color: var(--text-muted); }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ---- HOW IT WORKS ---- */
+.how-it-works { background: var(--white); }
+
+.steps-grid {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.step-card {
+  flex: 1;
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  position: relative;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.step-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+
+.step-number {
+  position: absolute;
+  top: -14px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: var(--white);
+  font-weight: 800;
+  font-size: .75rem;
+  padding: .25rem .7rem;
+  border-radius: 999px;
+}
+
+.step-icon { font-size: 2.5rem; margin: 1rem 0 .75rem; }
+
+.step-card h3 { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: .5rem; }
+.step-card p { font-size: .9rem; color: var(--text-muted); }
+
+.step-connector {
+  font-size: 1.5rem;
+  color: var(--green);
+  font-weight: 700;
+  padding: 0 .5rem;
+  flex-shrink: 0;
+}
+
+/* ---- FEATURES ---- */
+.features { background: var(--bg); }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.feature-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 2rem;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.feature-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+
+.feature-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.feature-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-bottom: .5rem; }
+.feature-card p { font-size: .9rem; color: var(--text-muted); }
+
+/* ---- AUDIENCE ---- */
+.audience { background: var(--white); }
+
+.audience-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.audience-card {
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+}
+
+.audience-img { height: 220px; overflow: hidden; }
+.audience-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.audience-card:hover .audience-img img { transform: scale(1.05); }
+
+.audience-content { padding: 2rem; flex: 1; display: flex; flex-direction: column; gap: 1rem; }
+
+.audience-tag {
+  display: inline-block;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: .3rem .8rem;
+  border-radius: 999px;
+}
+
+.audience-tag.driver { background: rgba(46,204,113,.15); color: #27ae60; }
+.audience-tag.manager { background: rgba(26,46,74,.12); color: var(--primary); }
+
+.audience-content h3 { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+
+.audience-list { list-style: none; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+.audience-list li { font-size: .9rem; color: var(--text-muted); }
+
+/* ---- TESTIMONIALS ---- */
+.testimonials { background: var(--bg); }
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.metric-card {
+  background: var(--primary);
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+}
+
+.metric-number { font-size: 2.2rem; font-weight: 800; color: var(--green); margin-bottom: .25rem; }
+.metric-label { font-size: .85rem; color: rgba(255,255,255,.7); }
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.testimonial-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stars { color: #f39c12; font-size: 1rem; letter-spacing: 2px; }
+
+.testimonial-card p { font-size: .95rem; color: var(--text-muted); font-style: italic; flex: 1; }
+
+.testimonial-author { display: flex; align-items: center; gap: .75rem; }
+
+.avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: .8rem;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.testimonial-author strong { display: block; font-size: .9rem; color: var(--primary); }
+.testimonial-author span { font-size: .8rem; color: var(--text-muted); }
+
+/* ---- CONTACT ---- */
+.contact { background: var(--white); }
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+.contact-info { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.contact-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.contact-info-icon {
+  font-size: 1.4rem;
+  width: 48px; height: 48px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.contact-info-item strong { display: block; font-size: .9rem; color: var(--primary); margin-bottom: .2rem; }
+.contact-info-item span { font-size: .85rem; color: var(--text-muted); }
+
+.contact-form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.form-group { display: flex; flex-direction: column; gap: .4rem; }
+
+.form-group label { font-size: .85rem; font-weight: 600; color: var(--primary); }
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: .75rem 1rem;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: .95rem;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color .2s, box-shadow .2s;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(46,204,113,.15);
+  background: var(--white);
+}
+
+.form-group textarea { resize: vertical; min-height: 130px; }
+
+/* ---- FOOTER ---- */
+.footer { background: var(--primary); color: rgba(255,255,255,.75); padding: 4rem 0 2rem; }
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.footer-brand p { font-size: .9rem; margin-top: .75rem; line-height: 1.7; }
+
+.social-links { display: flex; gap: .75rem; margin-top: 1.25rem; }
+.social-links a { font-size: 1.2rem; text-decoration: none; transition: opacity .2s; }
+.social-links a:hover { opacity: .75; }
+
+.footer-col h4 { color: var(--white); font-size: .9rem; font-weight: 700; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: .08em; }
+
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .65rem; }
+
+.footer-col ul a { color: rgba(255,255,255,.65); text-decoration: none; font-size: .9rem; transition: color .2s; }
+.footer-col ul a:hover { color: var(--green); }
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding-top: 2rem;
+  text-align: center;
+  font-size: .85rem;
+  color: rgba(255,255,255,.45);
+}
+
+/* ---- TOAST ---- */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--primary);
+  color: var(--white);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  font-size: .95rem;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity .3s, transform .3s;
+  pointer-events: none;
+  max-width: 360px;
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { border-left: 4px solid var(--green); }
+.toast.error { border-left: 4px solid var(--red); }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .nav-links, .nav-cta { display: none; }
+
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 68px; left: 0; right: 0;
+    background: var(--primary);
+    padding: 1.5rem;
+    gap: 1rem;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+
+  .hamburger { display: flex; }
+
+  .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; }
+  .hero-image { order: -1; }
+  .phone-frame img { height: 300px; }
+  .hero-stats { justify-content: center; }
+  .hero-buttons { justify-content: center; }
+  .card-top { left: 0; }
+  .card-bottom { right: 0; }
+
+  .steps-grid {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .step-connector { transform: rotate(90deg); font-size: 1rem; }
+
+  .features-grid { grid-template-columns: 1fr; }
+  .audience-grid { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .form-row { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .section { padding: 3rem 0; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .metric-number { font-size: 1.6rem; }
+}
+src/main/resources/static/js/main.js
+/* =============================================
+   PARKEASE – MAIN JAVASCRIPT
+   ============================================= */
+
+// ---- Navbar scroll effect ----
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ---- Mobile hamburger menu ----
+const hamburger = document.getElementById('hamburger');
+const navLinks  = document.getElementById('navLinks');
+
+hamburger.addEventListener('click', () => {
+  navLinks.classList.toggle('open');
+});
+
+// Close menu on link click
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => navLinks.classList.remove('open'));
+});
+
+// ---- Smooth scroll for anchor links ----
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', e => {
+    const target = document.querySelector(anchor.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      const offset = 80;
+      window.scrollTo({
+        top: target.getBoundingClientRect().top + window.scrollY - offset,
+        behavior: 'smooth'
+      });
+    }
+  });
+});
+
+// ---- Toast notification ----
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+  setTimeout(() => { toast.classList.remove('show'); }, 4000);
+}
+
+// ---- Contact form ----
+const form      = document.getElementById('contactForm');
+const submitBtn = document.getElementById('submitBtn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const nombre  = document.getElementById('nombre').value.trim();
+  const email   = document.getElementById('email').value.trim();
+  const tipo    = document.getElementById('tipo').value;
+  const mensaje = document.getElementById('mensaje').value.trim();
+
+  if (!nombre || !email || !mensaje) {
+    showToast('Por favor completa todos los campos requeridos.', 'error');
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Ingresa un correo electrónico válido.', 'error');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando...';
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre, email, tipo, mensaje })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      showToast(data.message, 'success');
+      form.reset();
+    } else {
+      showToast(data.message || 'Ocurrió un error.', 'error');
+    }
+  } catch (err) {
+    showToast('Error de conexión. Intenta nuevamente.', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Enviar mensaje';
+  }
+});
+
+// ---- Intersection Observer for animations ----
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity  = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll(
+  '.step-card, .feature-card, .audience-card, .testimonial-card, .metric-card'
+).forEach(el => {
+  el.style.opacity   = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity .5s ease, transform .5s ease';
+  observer.observe(el);
+});
+.gitignore
+target/
+*.class
+*.jar
+*.war
+.idea/
+*.iml
+.DS_Store
+*.log
+.env
+README.md
+# ParkEase – Landing Page
+
+Landing page para la app de reserva de estacionamientos en Lima, Perú.
+
+## Tecnologías
+- Java 17
+- Spring Boot 3.2
+- HTML5 + CSS3 + JavaScript vanilla
+
+## Requisitos
+- Java 17+
+- Maven 3.8+
+
+## Cómo ejecutar
+
+```bash
+git clone https://github.com/tu-usuario/parkease-landing.git
+cd parkease-landing
+mvn spring-boot:run
+Abre tu navegador en: http://localhost:8080
+
+Generar JAR ejecutable
+mvn clean package
+java -jar target/parkease-landing-1.0.0.jar
+Estructura
+Archivo	Descripción
+ParkEaseApplication.java	Punto de entrada Spring Boot
+ContactController.java	API REST para el formulario de contacto
+static/index.html	Landing page completa (6 secciones)
+static/css/styles.css	Todos los estilos
+static/js/main.js	Navbar, formulario, animaciones
+Secciones incluidas
+Hero con botones de descarga
+Cómo funciona (4 pasos)
+Características (6 funcionalidades)
+Para Conductores vs Para Gestores
+Testimonios con métricas
+Formulario de contacto + Footer
